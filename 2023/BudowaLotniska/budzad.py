@@ -1,0 +1,6 @@
+output = open('input.txt', 'r')
+n = output.readline()
+print(n)
+lines = output.readlines()
+print(lines)
+output.close()
