@@ -1,6 +1,6 @@
 import random
 n = 1500
-m = 1
+m = 2
 output = open('input.txt', 'w')
 output.write("%d %d"%(n,m))
 

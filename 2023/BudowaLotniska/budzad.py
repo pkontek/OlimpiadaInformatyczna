@@ -113,18 +113,15 @@ def szukajRozwiazania():
                         maxdl = k
                         break
                     else:
-                        '''jeśli się przecinają to zapisujemy punkt przecięcia jako jedynkę i ocięte przez przecięcie odcinki i szukamy dalej'''
-                        '''dopisuję punkt przecięcia'''
-                        zapiszPas([o1[0][0], o2[1][1]],[o1[0][0], o2[1][1]], True)
-                        '''dopisuję odcinki wyznaczone przez punkt przecięcia'''
-                        if o2[1][1] > 0:
-                            zapiszPas(o1[0], [o1[0][0], o2[1][1]-1],True)
-                        if o2[1][1] < n-1:
-                            zapiszPas([o1[0][0], o2[1][1]+1], o1[1],True)
-                        if o1[0][0] > 0:
-                            zapiszPas(o2[0], [o1[0][0]-1, o2[1][1]], False)
-                        if o1[0][0] < n-1:
-                            zapiszPas([o1[0][0]+1, o2[1][1]], o2[1], False)
+                        '''jeśli się przecinają to dopisujemy składowe odcinków i szukamy dalej'''
+                        for i in range(1, o1[1][1] - o1[0][1]):
+                            for j in range(i+1, o1[1][1] - o1[0][1] + 1):
+                                zapiszPas([o1[0][0], i], [o1[0][0], j], True)
+                            zapiszPas(o1[0], [o1[1][0], o1[1][1] - i], True)
+                        for i in range(1, o2[1][0] - o2[0][0]):
+                            for j in range(i+1, o2[1][0] - o2[0][0] + 1):
+                                zapiszPas([i, o2[0][1]], [j, o2[0][1]], False)
+                            zapiszPas(o2[0], [o2[1][0] - i, o2[1][1]], False)
 
 wczytajDaneZPliku()
 analizujWejscie()
