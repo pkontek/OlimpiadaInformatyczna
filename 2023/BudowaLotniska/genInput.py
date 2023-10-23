@@ -1,5 +1,5 @@
 import random
-n = 50
+n = 1500
 m = 1
 output = open('input.txt', 'w')
 output.write("%d %d"%(n,m))

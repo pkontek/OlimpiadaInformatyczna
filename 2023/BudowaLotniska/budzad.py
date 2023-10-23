@@ -1,24 +1,24 @@
 import numpy as np
 import itertools
 
-wolnePasy = {}
+wolnePasy = []
 pionowe = {}
 poziome = {}
-jedynki = []
 arr = []
 maxdl,n,m = 0, 0, 0
 
 
 def wczytajDaneZPliku():
-    global arr, n, m
+    global arr, n, m, wolnePasy, poziome
     output = open('input.txt', 'r')
     n, m = map(int,output.readline().split(" "))
     
     lines = output.readlines()
     output.close()
-
     arr = np.zeros((n,n))
-
+    wolnePasy = np.zeros(n+1,dtype=int)
+    pop = 1
+    start = [0,0]
     for x in range(n):
         for y in range(n):
             if (lines[x][y] == "X"):
@@ -32,32 +32,23 @@ def zapiszPas(x, y, poziom = True):
         dl = y[1] - x[1] + 1
     else:
         dl = y[0] - x[0] + 1
-    #print("%s -> %s = %d"%(x, y, dl))
-    if dl==1:
-        check = np.isin([x,y],jedynki)
-        if not (check[0][0] and check[0][1] and check[1][0] and check[1][1]):
-            jedynki.append([x,y])
-            if dl in wolnePasy:
-                wolnePasy[dl] += 1
-            else:
-                wolnePasy[dl] = 1
-    else:
+    
+    # print("%s -> %s = %d"%(x, y, dl))
+    if dl > 1:
         if poziom:
             if dl in poziome:
-                poziome[dl].append([x,y])
+                poziome[dl].append((x,y))
             else:
-                poziome[dl] = [[x,y]]
+                poziome[dl] = [(x,y)]
         else:
             if dl in pionowe:
-                pionowe[dl].append([x,y])
+                pionowe[dl].append((x,y))
             else:
-                pionowe[dl] = [[x,y]]
-        if dl in wolnePasy:
-            wolnePasy[dl] += 1
-        else:
-            wolnePasy[dl] = 1
-
+                pionowe[dl] = [(x,y)]
+        wolnePasy[dl] += 1
+    
 def analizujWejscie():
+    global wolnePasy
     jedynki = np.argwhere(arr == 1)
     pop = [-1,-1]
     for j in jedynki:
@@ -96,12 +87,14 @@ def analizujWejscie():
         pop = j
     if pop[1] < (n-1):
         zapiszPas([pop[1]+1, pop[0]], [n-1, pop[0]], False)
+    
+    '''wszystkie pola z zerami mogą być pasem o długości 1'''
+    wolnePasy[1] = n*n - np.count_nonzero(arr)
 
 def szukajRozwiazania():
     global maxdl
-    sortedDict = dict(sorted(wolnePasy.items(), reverse=True))
-    for k in sortedDict:
-        if m==1:
+    for k in range(n, 0, -1):
+        if m==1 and wolnePasy[k] > 0 or m==2 and wolnePasy[k] > 2:
             '''prosta sprawa - zwracamy najdłuższy pas'''
             maxdl = k
             break
@@ -132,15 +125,21 @@ def szukajRozwiazania():
                             zapiszPas(o2[0], [o1[0][0]-1, o2[1][1]], False)
                         if o1[0][0] < n-1:
                             zapiszPas([o1[0][0]+1, o2[1][1]], o2[1], False)
-            if wolnePasy[k] > 2:
-                '''mamy zawsze co najmniej 2 równoległe o tej samej długości, więc ta długość jest rozwiązaniem'''
-                maxdl = k
-                break
 
 wczytajDaneZPliku()
 analizujWejscie()
 szukajRozwiazania()
 
 print(maxdl)
+# print("wolnePasy: %s\npoziome: %s\npionowe: %s"%(wolnePasy,poziome,pionowe))
+
+
 # print(arr)
-# print("wolnePasy: %s\npoziome: %s\npionowe: %s\njedynki: %s"%(wolnePasy,poziome,pionowe,jedynki))
+
+# print(np.where(arr == 0))
+# print(np.argwhere(arr == 0))
+# print(np.argwhere(arr == 0).T)
+# it = np.nditer(arr, flags=['multi_index'])
+# for x in it:
+#     print("%d <%s>" % (x, it.multi_index), end=' ')
+
