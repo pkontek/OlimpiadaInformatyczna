@@ -1,7 +1,8 @@
 import random
-n = 30
+n = 50
+m = 1
 output = open('input.txt', 'w')
-output.write("%d"%n)
+output.write("%d %d"%(n,m))
 
 for i in range(n):
     output.write("\n")
