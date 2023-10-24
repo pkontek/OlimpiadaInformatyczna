@@ -1,0 +1,7 @@
+desktop.ini
+__pycache__
+.vscode
+rozwiazania/*.py
+rozwiazania/*.json
+zagadnienia
+idea.txt
