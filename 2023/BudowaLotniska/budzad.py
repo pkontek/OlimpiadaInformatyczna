@@ -1,5 +1,5 @@
+import sys
 import numpy as np
-import itertools
 
 wolnePasy = []
 pionowe = {}
@@ -7,14 +7,8 @@ poziome = {}
 arr = []
 maxdl,n,m = 0, 0, 0
 
-
-def wczytajDaneZPliku():
-    global arr, n, m, wolnePasy, poziome
-    output = open('input.txt', 'r')
-    n, m = map(int,output.readline().split(" "))
-    
-    lines = output.readlines()
-    output.close()
+def wczytajTablice(lines):
+    global arr, wolnePasy
     arr = np.zeros((n,n))
     wolnePasy = np.zeros(n+1,dtype=int)
     pop = 1
@@ -23,6 +17,24 @@ def wczytajDaneZPliku():
         for y in range(n):
             if (lines[x][y] == "X"):
                 arr[x][y] = 1
+
+def wczytajDaneZPliku():
+    global n, m
+    input = open('input.txt', 'r')
+    n, m = map(int,input.readline().split(" "))
+    
+    lines = input.readlines()
+    input.close()
+    
+    wczytajTablice(lines)
+    
+def wczytajDaneZStdin():
+    global n, m
+    input = sys.stdin
+    n, m = map(int,input.readline().split(" "))
+    lines = input.readlines()
+    
+    wczytajTablice(lines)
 
 def zapiszPas(x, y, poziom = True):
     global wolnePasy, pionowe, poziome, jedynki
@@ -114,16 +126,17 @@ def szukajRozwiazania():
                         break
                     else:
                         '''jeśli się przecinają to dopisujemy składowe odcinków i szukamy dalej'''
-                        for i in range(1, o1[1][1] - o1[0][1]):
+                        for i in range(1, o1[1][1] - o1[0][1]): #poziome
                             for j in range(i+1, o1[1][1] - o1[0][1] + 1):
                                 zapiszPas([o1[0][0], i], [o1[0][0], j], True)
                             zapiszPas(o1[0], [o1[1][0], o1[1][1] - i], True)
-                        for i in range(1, o2[1][0] - o2[0][0]):
+
+                        for i in range(1, o2[1][0] - o2[0][0]): #pionowe
                             for j in range(i+1, o2[1][0] - o2[0][0] + 1):
                                 zapiszPas([i, o2[0][1]], [j, o2[0][1]], False)
                             zapiszPas(o2[0], [o2[1][0] - i, o2[1][1]], False)
 
-wczytajDaneZPliku()
+wczytajDaneZStdin()
 analizujWejscie()
 szukajRozwiazania()
 
