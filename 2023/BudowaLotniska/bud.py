@@ -79,6 +79,8 @@ def analizujWejscie():
         pop = j
     if pop[1] < (n-1):
         zapiszPas([pop[0], pop[1]+1], [pop[0], n-1])
+    if pop[0] < (n-1):
+        zapiszPas([n-1, 0], [n-1, n-1])
 
     '''odwracam tablicę i szukam pionowych pasów'''
     jedynki = np.argwhere(arr.T == 1)
@@ -99,49 +101,116 @@ def analizujWejscie():
         pop = j
     if pop[1] < (n-1):
         zapiszPas([pop[1]+1, pop[0]], [n-1, pop[0]], False)
-    
+    if pop[0] < (n-1):
+        zapiszPas([0, n-1], [n-1, n-1], False)
     '''wszystkie pola z zerami mogą być pasem o długości 1'''
     wolnePasy[1] = n*n - np.count_nonzero(arr)
 
 def szukajRozwiazania():
     global maxdl
     for k in range(n, 0, -1):
-        if m==1 and wolnePasy[k] > 0 or m==2 and wolnePasy[k] > 2:
-            '''prosta sprawa - zwracamy najdłuższy pas'''
-            maxdl = k
-            break
-        else:
-            if wolnePasy[k] == 2:
-                '''mamy dokładnie 2 pasy trzeba sprawdzić czy są równoległe jeśli nie to czy się przecinają'''
-                if k not in poziome or k not in pionowe:
-                    '''mamy 2 pasy są równoległe'''
-                    maxdl = k
-                    break
-                else:
-                    o1 = poziome[k][0]
-                    o2 = pionowe[k][0]
-                    '''sprawdzenie czy się przecinają'''
-                    if not (o2[0][0] <= o1[0][0] and o1[0][0] <= o2[1][0] and o1[0][1] <= o2[0][1] and o2[0][1] <= o1[1][1]):
+        if wolnePasy[k] > 0:
+            if m==1 or m==2 and wolnePasy[k] > 2:
+                '''prosta sprawa - zwracamy najdłuższy pas'''
+                maxdl = k
+                break
+            else:
+                if wolnePasy[k] == 2:
+                    '''mamy dokładnie 2 pasy trzeba sprawdzić czy są równoległe jeśli nie to czy się przecinają'''
+                    if k not in poziome or k not in pionowe:
+                        '''mamy 2 pasy które są równoległe'''
                         maxdl = k
                         break
                     else:
-                        '''jeśli się przecinają to dopisujemy składowe odcinków i szukamy dalej'''
-                        for i in range(1, o1[1][1] - o1[0][1]): #poziome
-                            for j in range(i+1, o1[1][1] - o1[0][1] + 1):
-                                zapiszPas([o1[0][0], i], [o1[0][0], j], True)
-                            zapiszPas(o1[0], [o1[1][0], o1[1][1] - i], True)
+                        o1 = poziome[k][0]
+                        o2 = pionowe[k][0]
+                        '''sprawdzenie czy się przecinają'''
+                        if not (o2[0][0] <= o1[0][0] and o1[0][0] <= o2[1][0] and o1[0][1] <= o2[0][1] and o2[0][1] <= o1[1][1]):
+                            maxdl = k
+                            break
+                        else:
+                            '''jeśli się przecinają to dopisujemy składowe odcinków i szukamy dalej'''
+                            for i in range(1, o1[1][1] - o1[0][1]): #poziome
+                                for j in range(i+1, o1[1][1] - o1[0][1] + 1):
+                                    zapiszPas([o1[0][0], i], [o1[0][0], j], True)
+                                zapiszPas(o1[0], [o1[1][0], o1[1][1] - i], True)
 
-                        for i in range(1, o2[1][0] - o2[0][0]): #pionowe
-                            for j in range(i+1, o2[1][0] - o2[0][0] + 1):
-                                zapiszPas([i, o2[0][1]], [j, o2[0][1]], False)
-                            zapiszPas(o2[0], [o2[1][0] - i, o2[1][1]], False)
+                            for i in range(1, o2[1][0] - o2[0][0]): #pionowe
+                                for j in range(i+1, o2[1][0] - o2[0][0] + 1):
+                                    zapiszPas([i, o2[0][1]], [j, o2[0][1]], False)
+                                zapiszPas(o2[0], [o2[1][0] - i, o2[1][1]], False)
+                else:
+                    '''wolnePasy[k] == 1'''
+                    '''trzeba sprawdzić czy z jakimś mniwszym nie tworzy rozwiązania'''
+                    if k > 2 and k in poziome:
+                        o1 = poziome[k][0]
+                        podzial = int(k/2)
+                        korekta = 0
+                        '''sprawdzam następne najdłuższe'''
+                        for r in range(k-1, podzial, -1):
+                            if wolnePasy[r] > 0:
+                                if r in poziome: 
+                                    '''na pewno się nie przetną'''
+                                    podzial = r
+                                    break
+                                else:
+                                    o2 = pionowe[r][0]
+                                    if wolnePasy[r] > 1 or not (o2[0][0] <= o1[0][0] and o1[0][0] <= o2[1][0] and o1[0][1] <= o2[0][1] and o2[0][1] <= o1[1][1]):
+                                        '''są dwa w pionie lub nie przecinają się'''
+                                        podzial = r - 1
+                                        break
+                                    else:
+                                        '''przecinają się, sprawdzam czy po przecięciu zostanie nam wystarczająco długi odcinek'''
+                                        p = o2[0][1] - o1[0][1]
+                                        if p >= r or (k - p - 1) >= r:
+                                            podzial = p 
+                                            korekta = 1
+                                            break
+                        zapiszPas(o1[0], [o1[0][0], o1[0][1] + podzial-1], True)
+                        zapiszPas([o1[0][0], o1[0][1] + podzial + korekta], o1[1], True)
+                    if k > 2 and k in pionowe:
+                        o2 = pionowe[k][0]
+                        podzial = int(k/2)
+                        korekta = 0
+                        '''sprawdzam następne najdłuższe'''
+                        for r in range(k-1, podzial, -1):
+                            if wolnePasy[r] > 0:
+                                if r in pionowe: 
+                                    '''na pewno się nie przetną'''
+                                    podzial = r 
+                                    break
+                                else:
+                                    o1 = poziome[r][0]
+                                    if wolnePasy[r] > 1 or not (o2[0][0] <= o1[0][0] and o1[0][0] <= o2[1][0] and o1[0][1] <= o2[0][1] and o2[0][1] <= o1[1][1]):
+                                        '''są dwa w pionie lub nie przecinają się'''
+                                        podzial = r - 1
+                                        break
+                                    else:
+                                        '''przecinają się, sprawdzam czy po przecięciu zostanie nam wystarczająco długi odcinek'''
+                                        p = o1[0][0] - o2[0][0] 
+                                        if p >= r or (k - p - 1) >= r:
+                                            podzial = p 
+                                            korekta = 1
+                                            break
+                        # print("k: %s, r: %s, podzial: %s, korekta: %s"%(k,r,podzial,korekta))
+                        # print([o2[0], [o2[0][0] + podzial - 1, o2[0][1]]])
+                        # print([[o2[0][0] + podzial + korekta, o2[0][1]], o2[1]])
+                        zapiszPas(o2[0], [o2[0][0] + podzial - 1, o2[0][1]], False)
+                        zapiszPas([o2[0][0] + podzial + korekta, o2[0][1]], o2[1], False)
+                                
+
 
 wczytajDaneZStdin()
+# wczytajDaneZPliku()
 analizujWejscie()
+# print("wolnePasy: %s\npoziome: %s\npionowe: %s"%(wolnePasy,poziome,pionowe))
+
 szukajRozwiazania()
 
-print(maxdl)
+# print(arr)
 # print("wolnePasy: %s\npoziome: %s\npionowe: %s"%(wolnePasy,poziome,pionowe))
+
+print(maxdl)
 
 
 # print(arr)
