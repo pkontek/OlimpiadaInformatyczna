@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import pathlib
 
 wolnePasy = []
 pionowe = {}
@@ -18,9 +19,9 @@ def wczytajTablice(lines):
             if (lines[x][y] == "X"):
                 arr[x][y] = 1
 
-def wczytajDaneZPliku():
+def wczytajDaneZPliku(path):
     global n, m
-    input = open('input.txt', 'r')
+    input = open(path, 'r')
     n, m = map(int,input.readline().split(" "))
     
     lines = input.readlines()
@@ -109,6 +110,7 @@ def analizujWejscie():
 def szukajRozwiazania():
     global maxdl
     for k in range(n, 0, -1):
+        # print("k:%s, wolnePasy[k]:%s"%(k,wolnePasy[k] ))
         if wolnePasy[k] > 0:
             if m==1 or m==2 and wolnePasy[k] > 2:
                 '''prosta sprawa - zwracamy najdłuższy pas'''
@@ -130,6 +132,8 @@ def szukajRozwiazania():
                             break
                         else:
                             '''jeśli się przecinają to dopisujemy składowe odcinków i szukamy dalej'''
+                            ####
+                            #### DO PRZEPISANIA - trzeba dzielić odcinki do punktu przecięcia i po punkcie przecięcia, ale nie wiem czy potrzeba je dzielić na tak wiele odcinków, bo może dalszy kdo wsystarczy
                             for i in range(1, o1[1][1] - o1[0][1]): #poziome
                                 for j in range(i+1, o1[1][1] - o1[0][1] + 1):
                                     zapiszPas([o1[0][0], i], [o1[0][0], j], True)
@@ -157,7 +161,7 @@ def szukajRozwiazania():
                                     o2 = pionowe[r][0]
                                     if wolnePasy[r] > 1 or not (o2[0][0] <= o1[0][0] and o1[0][0] <= o2[1][0] and o1[0][1] <= o2[0][1] and o2[0][1] <= o1[1][1]):
                                         '''są dwa w pionie lub nie przecinają się'''
-                                        podzial = r - 1
+                                        podzial = r 
                                         break
                                     else:
                                         '''przecinają się, sprawdzam czy po przecięciu zostanie nam wystarczająco długi odcinek'''
@@ -166,6 +170,9 @@ def szukajRozwiazania():
                                             podzial = p 
                                             korekta = 1
                                             break
+                        # print("poziom k: %s, r: %s, podzial: %s, korekta: %s"%(k,r,podzial,korekta))
+                        # print([o1[0], [o1[0][0], o1[0][1] + podzial-1]])
+                        # print([[o1[0][0], o1[0][1] + podzial + korekta], o1[1]])
                         zapiszPas(o1[0], [o1[0][0], o1[0][1] + podzial-1], True)
                         zapiszPas([o1[0][0], o1[0][1] + podzial + korekta], o1[1], True)
                     if k > 2 and k in pionowe:
@@ -183,7 +190,7 @@ def szukajRozwiazania():
                                     o1 = poziome[r][0]
                                     if wolnePasy[r] > 1 or not (o2[0][0] <= o1[0][0] and o1[0][0] <= o2[1][0] and o1[0][1] <= o2[0][1] and o2[0][1] <= o1[1][1]):
                                         '''są dwa w pionie lub nie przecinają się'''
-                                        podzial = r - 1
+                                        podzial = r 
                                         break
                                     else:
                                         '''przecinają się, sprawdzam czy po przecięciu zostanie nam wystarczająco długi odcinek'''
@@ -192,23 +199,26 @@ def szukajRozwiazania():
                                             podzial = p 
                                             korekta = 1
                                             break
-                        # print("k: %s, r: %s, podzial: %s, korekta: %s"%(k,r,podzial,korekta))
+                        # print("pion k: %s, r: %s, podzial: %s, korekta: %s"%(k,r,podzial,korekta))
+                        # print(o1)
+                        # print(o2)
                         # print([o2[0], [o2[0][0] + podzial - 1, o2[0][1]]])
                         # print([[o2[0][0] + podzial + korekta, o2[0][1]], o2[1]])
                         zapiszPas(o2[0], [o2[0][0] + podzial - 1, o2[0][1]], False)
                         zapiszPas([o2[0][0] + podzial + korekta, o2[0][1]], o2[1], False)
-                                
-
+                    
 
 wczytajDaneZStdin()
-# wczytajDaneZPliku()
+# wczytajDaneZPliku('input.txt')
+# wczytajDaneZPliku('%s/testy/in/test44.in'%pathlib.Path(__file__).parent.resolve())
 analizujWejscie()
+
+# print(arr)
 # print("wolnePasy: %s\npoziome: %s\npionowe: %s"%(wolnePasy,poziome,pionowe))
 
 szukajRozwiazania()
 
-# print(arr)
-# print("wolnePasy: %s\npoziome: %s\npionowe: %s"%(wolnePasy,poziome,pionowe))
+
 
 print(maxdl)
 
