@@ -108,7 +108,7 @@ def doTest(testname):
             error[no] = indent + Fore.RED + line
         error.pop()
         error = '\n'.join(error)
-        report['message'] = f'Test {test} errored: {memory}\n' + Fore.RESET + error + "\n"
+        report['message'] = f'Test {testname} errored: {memory}\n' + Fore.RESET + error + "\n"
     elif stdout == files['out']:
         report['status'] = 'ok'
         report['message'] = f'Test {testname} passed\n'
