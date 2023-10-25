@@ -209,7 +209,7 @@ def szukajRozwiazania():
                     
 
 wczytajDaneZStdin()
-# wczytajDaneZPliku('input.txt')
+# wczytajDaneZPliku("%s/input.txt"%pathlib.Path(__file__).parent.resolve())
 # wczytajDaneZPliku('%s/testy/in/test44.in'%pathlib.Path(__file__).parent.resolve())
 analizujWejscie()
 

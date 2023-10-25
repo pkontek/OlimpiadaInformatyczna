@@ -1,7 +1,7 @@
-import random
-n = 1500
+import random, pathlib
+n = 5
 m = 2
-output = open('input.txt', 'w')
+output = open("%s/input.txt"%pathlib.Path(__file__).parent.resolve(), 'w')
 output.write("%d %d"%(n,m))
 
 for i in range(n):
