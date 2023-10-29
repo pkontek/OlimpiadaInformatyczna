@@ -155,7 +155,7 @@ def doTest(testname):
         error.pop()
         error = '\n'.join(error)
         report['message'] = f'Test {test} errored: {memory}\n' + Fore.RESET + error + "\n"
-    elif stdout == files['out']:
+    elif stdout.rstrip() == files['out'].rstrip():
         report['status'] = 'ok'
         report['message'] = f'Test {testname} passed\n'
     else:
