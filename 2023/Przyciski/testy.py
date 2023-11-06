@@ -63,7 +63,7 @@ def doTest(testname):
         files[type] = readTextFile(abs)
 
     # Import solution
-    solution = pathlib.Path(f"{dir}/bud.py").absolute()
+    solution = pathlib.Path(f"{dir}/prz.py").absolute()
     if(not os.path.exists(solution)):
         print(f"Solution file {solution} not found")
         exit(2)
@@ -109,7 +109,7 @@ def doTest(testname):
         error.pop()
         error = '\n'.join(error)
         report['message'] = f'Test {testname} errored: {memory}\n' + Fore.RESET + error + "\n"
-    elif stdout == files['out']:
+    elif stdout == files['out'].rstrip():
         report['status'] = 'ok'
         report['message'] = f'Test {testname} passed\n'
     else:
@@ -124,6 +124,6 @@ def doTest(testname):
 log(f"Running tests:\n", 'info')
 
 for i in range(1,1000001):
-    doTest("test%i"%i)
+    doTest("prz%i"%i)
 
 log(f"Tests finished:\n{Fore.GREEN + str(stats['ok'])} passed{Fore.RESET},{Fore.RED} {str(stats['fail'])} failed{Fore.RESET} and {Fore.RED}{stats['error']} errored", 'info')

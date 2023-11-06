@@ -27,27 +27,49 @@ def wczytajDaneZStdin():
     zaladujTablice(lines)
 
 def daSieAktywowacParzyste():
-    
+    global przyciski, przyciskiWKolumnie, przyciskiWWierszu
     '''
     
     AKTYWNE PARZYSTE 
-    aktywowanie parzystych przycisków będzie możliwe tylko jeśli istnieją przyciski co najmniej 2 przyciski w jednym rzędzie mające swój odpowiednik w drugim rzędzie. Np.:
+    a. aktywowanie parzystych przycisków będzie możliwe jeśli istnieją przyciski co najmniej 2 przyciski w jednym rzędzie mające swój odpowiednik w drugim rzędzie. Np.:
     o o -    o - - o    - - - -  
     - - -    - - - -    - o o -
     o o -    o - - o    - o o -
              - - - -    - - - -
     
+    b. jest jeszcze taki przypadek:
+    - - o o    - - o o
+    - - - -    - - - - 
+    o - o -    o - - o 
+    o - - o    o - o -
+
+    Aby określić czy mamy możliwość zapalić parzyste trzeba usunąć pojedyncze przyciski z wiersza i wykluczyć wiersze zerowe. jeśli pozostaną co najmniej 2 wiersze i 2 kolumny z przyciskami, możan będzie właczyć tak aby zapewnić parzystość.
+
     '''
     jest = False
+    # print("przyciski: \n%s"%przyciski)
+    # print("przyciskiWWierszu: %s"%przyciskiWWierszu)
+    # print("przyciskiWKolumnie: %s"%przyciskiWKolumnie)
     
-    # wszystkie kombinacje wierszy z więcej niż jednym przyciskiem
-    for wiersze in itertools.combinations(np.argwhere(przyciskiWWierszu == 2),2):
-        w1,w2 = wiersze[0][0],wiersze[1][0]
-        a = np.array([przyciski[w1],przyciski[w2]])
-        if len(np.where(np.sum(a,0)>=2)[0]) > 1:
-            jest = True
-            break
-        
+    jedynkiWWierszach = np.argwhere(przyciskiWWierszu==1)
+    jedynkiWKolunach  = np.argwhere(przyciskiWKolumnie==1)
+
+    while (len(jedynkiWWierszach) + len(jedynkiWKolunach)) > 0:
+        if len(jedynkiWWierszach) > 0:
+            wiersz = jedynkiWWierszach[0][0]
+            kolumna = np.argwhere(przyciski[wiersz]==1)[0][0]
+        else:
+            kolumna = jedynkiWKolunach[0][0]
+            wiersz = np.argwhere(przyciski.T[kolumna]==1)[0][0]
+        przyciski[wiersz, kolumna] = 0
+        przyciskiWWierszu[wiersz] -= 1
+        przyciskiWKolumnie[kolumna] -= 1
+        jedynkiWWierszach = np.argwhere(przyciskiWWierszu==1)
+        jedynkiWKolunach  = np.argwhere(przyciskiWKolumnie==1)
+    
+    if len(np.argwhere(przyciskiWWierszu>1)) >1 and len(np.argwhere(przyciskiWKolumnie>1))>1:
+        jest = True
+
     return jest
 
 def daSieAktywowacNieparzyste():
@@ -90,10 +112,10 @@ def daSieAktywowacNieparzyste():
 def zapiszPrzycisk(x,y):
     global przyciski, przyciskiWWierszu, przyciskiWKolumnie
     przyciski[x-1,y-1] = 1
-    if przyciskiWWierszu[x-1] < 2:
-        przyciskiWWierszu[x-1] += 1
-    if przyciskiWKolumnie[y-1] < 2:
-        przyciskiWKolumnie[y-1] += 1
+    # if przyciskiWWierszu[x-1] < 2:
+    przyciskiWWierszu[x-1] += 1
+    # if przyciskiWKolumnie[y-1] < 2:
+    przyciskiWKolumnie[y-1] += 1
     
 def zaladujTablice(lines):
     global przyciski, przyciskiWWierszu, przyciskiWKolumnie
@@ -103,19 +125,19 @@ def zaladujTablice(lines):
     przyciski = np.zeros((n,n), np.int8)
     
     #do zastanowienia czy trzeba zwiększać tą ilość jeśli jest już 2
-    przyciskiWWierszu = np.zeros((n), np.int8)
-    przyciskiWKolumnie = np.zeros((n), np.int8)
+    przyciskiWWierszu = np.zeros((n), np.int32)
+    przyciskiWKolumnie = np.zeros((n), np.int32)
     
     for l in lines:
         x, y  = map(int,l.split(" "))
         zapiszPrzycisk(x,y)
     
     if not jest:
-        jest = daSieAktywowacParzyste()
-
-    if not jest:
         jest = daSieAktywowacNieparzyste()
     
+    if not jest:
+        jest = daSieAktywowacParzyste()
+
     if jest:
         print("TAK")
     else:
@@ -126,6 +148,7 @@ def zaladujTablice(lines):
                 
 wczytajDaneZStdin()
 # wczytajDaneZPliku("%s/input.txt"%pathlib.Path(__file__).parent.resolve())
+# wczytajDaneZPliku("%s/testy/in/prz23.in"%pathlib.Path(__file__).parent.resolve())
 # wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz0.in')
 # wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz3ocen.in')
 # print("n: %i, m: %i"%(n,m))
