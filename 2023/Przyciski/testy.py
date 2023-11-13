@@ -123,7 +123,13 @@ def doTest(testname):
 
 log(f"Running tests:\n", 'info')
 
-for i in range(1,1000001):
-    doTest("prz%i"%i)
+# for i in range(1,1000001):
+#     doTest("prz%i"%i)
+
+dir = pathlib.Path(__file__).parent.resolve()
+for path in dir.glob('**/testy/in/*.in'):
+     # because path is object not string
+     path_in_str = os.path.basename(path)[:-3]
+     doTest(path_in_str)
 
 log(f"Tests finished:\n{Fore.GREEN + str(stats['ok'])} passed{Fore.RESET},{Fore.RED} {str(stats['fail'])} failed{Fore.RESET} and {Fore.RED}{stats['error']} errored", 'info')
