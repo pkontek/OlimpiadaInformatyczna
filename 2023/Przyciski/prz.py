@@ -4,12 +4,13 @@ import pathlib
 import itertools
 
 n,m = 0,0
-przyciski = []
 wierszeZDwomaPrzyciskami = []
 ilePrzyciskowWWierszu = []
 ilePrzyciskowWKolumnie = []
 przyciskiWWierszu = []
 przyciskiWKolumnie = []
+stos = []
+przyciski = []
 V = 0
 
 def wczytajDaneZPliku(path):
@@ -62,8 +63,22 @@ def daSieAktywowacParzyste():
             for nast in k[1:]:
                 dodajDoGrafu(graf, poprz, nast)
                 poprz = nast
-
-    return grafMaCykl(graf)
+    jest = grafMaCykl(graf)
+    wynik = []
+    if jest:
+        poprz = None
+        for p in stos[::-1]:
+            if poprz == None:
+                wynik.append(p)
+            else:
+                if poprz != wynik[-1:][0]:
+                    a = przyciski[p]
+                    b = przyciski[poprz]
+                    c = przyciski[wynik[-1:][0]]
+                    if (b[0] == c[0] and a[0] != c[0]) or (b[1] == c[1] and a[1] != c[1] ):
+                        wynik.append(poprz)
+            poprz = p
+    return jest, wynik
 
 def dodajDoGrafu(graf, prz1, prz2):
     if prz1 not in graf:
@@ -90,7 +105,8 @@ def grafMaCykl(graf):
 def isCyclicUtil(graf, v, visited, parent):
  
     visited[v] = True
-    
+    stos.append(v)
+
     #jeśli węzła nie ma w grafie - to znaczy że nie ma powiązań z innymi
     if v in graf.keys():
 
@@ -110,11 +126,10 @@ def isCyclicUtil(graf, v, visited, parent):
             # of current vertex,
             # then there is a cycle
             elif parent != i:
+                stos.append(i)
                 return True
-
+    stos.pop()
     return False
-
-    
     
 def daSieAktywowacNieparzyste():
 
@@ -154,12 +169,13 @@ def daSieAktywowacNieparzyste():
 
 def zapiszPrzycisk(x,y):
     global przyciski, ilePrzyciskowWWierszu, ilePrzyciskowWKolumnie, przyciskiWWierszu, przyciskiWKolumnie, V
-    przyciski[x-1,y-1] = 1
+    
     # if przyciskiWWierszu[x-1] < 2:
     ilePrzyciskowWWierszu[x-1] += 1
     # if przyciskiWKolumnie[y-1] < 2:
     ilePrzyciskowWKolumnie[y-1] += 1
-    
+
+    przyciski.append((x-1, y-1))
     if przyciskiWWierszu[x-1] is None:
         przyciskiWWierszu[x-1] = []
     przyciskiWWierszu[x-1].append(V)
@@ -170,12 +186,10 @@ def zapiszPrzycisk(x,y):
     V += 1
     
 def zaladujTablice(lines):
-    global przyciski, ilePrzyciskowWWierszu, ilePrzyciskowWKolumnie, przyciskiWWierszu, przyciskiWKolumnie
+    global ilePrzyciskowWWierszu, ilePrzyciskowWKolumnie, przyciskiWWierszu, przyciskiWKolumnie
     
     jest = False
 
-    przyciski = np.zeros((n,n), np.int8)
-    
     #do zastanowienia czy trzeba zwiększać tą ilość jeśli jest już 2
     ilePrzyciskowWWierszu = np.zeros((n), np.int32)
     ilePrzyciskowWKolumnie = np.zeros((n), np.int32)
@@ -185,15 +199,19 @@ def zaladujTablice(lines):
     for l in lines:
         x, y  = map(int,l.split(" "))
         zapiszPrzycisk(x,y)
+    wynik = []
+    if not jest:
+        jest, wynik = daSieAktywowacParzyste()
     
     if not jest:
         jest = daSieAktywowacNieparzyste()
     
-    if not jest:
-        jest = daSieAktywowacParzyste()
-
     if jest:
         print("TAK")
+        if wynik != []:
+            print(len(wynik))
+            for p in wynik:
+                print(p+1)
     else:
         print("NIE")
     
@@ -201,10 +219,10 @@ def zaladujTablice(lines):
 sys.setrecursionlimit(100000)
 # print(sys.getrecursionlimit())
                 
-wczytajDaneZStdin()
+# wczytajDaneZStdin()
 # wczytajDaneZPliku("%s/input.txt"%pathlib.Path(__file__).parent.resolve())
 # wczytajDaneZPliku("%s/testy/in/prz25.in"%pathlib.Path(__file__).parent.resolve())
-# wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz0.in')
+wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz0.in')
 # wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz2ocen.in')
 # wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz3ocen.in')
 # print("n: %i, m: %i"%(n,m))
