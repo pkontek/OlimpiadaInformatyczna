@@ -42,25 +42,40 @@ def analizujWejscie():
     for i in range(0,n-k):
         r = s[i:i + k + 1]
         dopiszR(r)
+    # print(wyst)
     
 def tworzSlowo():
     global s, wynik
+    uzyte = set()
+    '''jeśli ponownie użyjemy tego samego prefiksu do dalszego tworzenia słowa mamy już cykl'''
     for i in range(b-n):
-        r = s[-k:n+i]
+        r = s[-k:]
         znak = "a"
         ile = 0
-        if r in wyst.keys():
+        if r in uzyte:
+            break
+        uzyte.add(r)    
+        if r in wyst:
             for z in wyst[r].keys():
                 if ile < wyst[r][z]:
                     znak = z
                     ile = wyst[r][z]
-
+                if ile == wyst[r][z] and z < znak:
+                    znak = z
         s += znak
         dopiszR(r+znak)
+    cykl = s[n:]
+    '''być może a zaczyna sie w środku cyku trzeb to dopisać'''
+    wynik = cykl[(a-n)%len(cykl)-1:] 
+    '''dopisujemy cylkle o jeden więcej, bo może konczyć się w środku cyklu'''
+    wynik += (cykl*(1+int((b-a)/len(cykl))))
+    '''obcinamy wynik aby zawierał tylko znaki od a do b'''
+    wynik = wynik[:b-a+1] 
+       
 
 
 # wczytajDaneZPliku("%s/input.txt"%pathlib.Path(__file__).parent.resolve())
-# wczytajDaneZPliku("2023/tester-oi-main/ocen/in/cza3ocen.in")
+# wczytajDaneZPliku("2023/tester-oi-main/ocen/in/cza1ocen.in")
 
 # print("n: %i, k: %i, a: %i, b: %i"%(n, k, a, b))
 # print("s: '%s'"%s)
@@ -68,5 +83,5 @@ def tworzSlowo():
 wczytajDaneZStdin()
 analizujWejscie()
 tworzSlowo()
-
-print(s[-(b+1-a):])
+# print(s)
+print(wynik)
