@@ -211,7 +211,7 @@ def zaladujTablice(lines):
         if wynik != []:
             print(len(wynik))
             for p in wynik:
-                print(p+1)
+                print(p+1, end = " ")
     else:
         print("NIE")
     
