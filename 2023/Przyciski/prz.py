@@ -219,10 +219,10 @@ def zaladujTablice(lines):
 sys.setrecursionlimit(100000)
 # print(sys.getrecursionlimit())
                 
-# wczytajDaneZStdin()
+wczytajDaneZStdin()
 # wczytajDaneZPliku("%s/input.txt"%pathlib.Path(__file__).parent.resolve())
 # wczytajDaneZPliku("%s/testy/in/prz25.in"%pathlib.Path(__file__).parent.resolve())
-wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz0.in')
+# wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz0.in')
 # wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz2ocen.in')
 # wczytajDaneZPliku('2023/tester-oi-main/ocen/in/prz3ocen.in')
 # print("n: %i, m: %i"%(n,m))
