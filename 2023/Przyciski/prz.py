@@ -216,7 +216,7 @@ def zaladujTablice(lines):
         print("NIE")
     
 
-sys.setrecursionlimit(100000)
+sys.setrecursionlimit(1000000)
 # print(sys.getrecursionlimit())
                 
 wczytajDaneZStdin()
