@@ -41,20 +41,23 @@ def dopiszR(r):
 def analizujWejscie():
     for i in range(0,n-k):
         r = s[i:i + k + 1]
+        # print(r)
         dopiszR(r)
     # print(wyst)
     
 def tworzSlowo():
     global s, wynik
-    uzyte = set()
+    uzyte = []
     '''jeśli ponownie użyjemy tego samego prefiksu do dalszego tworzenia słowa mamy już cykl'''
+    cyklStart = 0
     for i in range(b-n):
         r = s[-k:]
         znak = "a"
         ile = 0
         if r in uzyte:
+            cyklStart = uzyte.index(r) 
             break
-        uzyte.add(r)    
+        uzyte.append(r)    
         if r in wyst:
             for z in wyst[r].keys():
                 if ile < wyst[r][z]:
@@ -63,25 +66,36 @@ def tworzSlowo():
                 if ile == wyst[r][z] and z < znak:
                     znak = z
         s += znak
-        dopiszR(r+znak)
-    cykl = s[n:]
+        # dopiszR(r+znak)
+    # print(s)
+    cykl = s[n + cyklStart:]
+    przedCykl = s[n:n + cyklStart]
+    # print(przedCykl, cykl)
     '''być może a zaczyna sie w środku cyku trzeb to dopisać'''
-    wynik = cykl[(a-n)%len(cykl)-1:] 
+    if (a-n <= cyklStart):
+        wynik = przedCykl[a-n-1:]
+    else:
+        wynik = cykl[(a-n-cyklStart)%len(cykl)-1:] 
+    # print(wynik)
     '''dopisujemy cylkle o jeden więcej, bo może konczyć się w środku cyklu'''
     wynik += (cykl*(1+int((b-a)/len(cykl))))
+    # print(wynik)
     '''obcinamy wynik aby zawierał tylko znaki od a do b'''
     wynik = wynik[:b-a+1] 
-       
-
+    
 
 # wczytajDaneZPliku("%s/input.txt"%pathlib.Path(__file__).parent.resolve())
+# wczytajDaneZPliku("%s/testy/in/cza1.in"%pathlib.Path(__file__).parent.resolve())
 # wczytajDaneZPliku("2023/tester-oi-main/ocen/in/cza1ocen.in")
 
 # print("n: %i, k: %i, a: %i, b: %i"%(n, k, a, b))
 # print("s: '%s'"%s)
+#    Received: cbcacbaadaadaadaadaadaadaadaadaadaadaadaadaadaadaad
+#    Expected: cbaadaadaadaadaadaadaadaadaadaadaadaadaadaadaadaada
 
 wczytajDaneZStdin()
 analizujWejscie()
+# print("mam mapę")
 tworzSlowo()
 # print(s)
 print(wynik)
